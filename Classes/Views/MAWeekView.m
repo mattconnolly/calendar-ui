@@ -825,7 +825,9 @@ static const CGFloat kCorner       = 5.0;
 
 - (void)tapDetectingView:(TapDetectingView *)view gotSingleTapAtPoint:(CGPoint)tapPoint {
 	if ([self.weekView.delegate respondsToSelector:@selector(weekView:eventTapped:)]) {
+        self.weekView.tappedView = view;
         [self.weekView.delegate weekView:self.weekView eventTapped:self.event];
+        self.weekView.tappedView = nil;
 	}
 }
 

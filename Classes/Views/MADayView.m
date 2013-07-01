@@ -468,7 +468,9 @@ static const CGFloat kCorner       = 5.0;
 
 - (void)tapDetectingView:(TapDetectingView *)view gotSingleTapAtPoint:(CGPoint)tapPoint {
 	if ([self.dayView.delegate respondsToSelector:@selector(dayView:eventTapped:)]) {
+        self.dayView.tappedView = view;
         [self.dayView.delegate dayView:self.dayView eventTapped:self.event];
+        self.dayView.tappedView = nil;
 	}
 }
 

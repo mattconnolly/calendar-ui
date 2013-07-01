@@ -62,6 +62,7 @@
 @property (nonatomic,copy) NSDate *day;
 @property (nonatomic,unsafe_unretained) IBOutlet id<MADayViewDataSource> dataSource;
 @property (nonatomic,unsafe_unretained) IBOutlet id<MADayViewDelegate> delegate;
+@property (nonatomic,assign) UIView* tappedView;
 
 - (void)reloadData;
 
