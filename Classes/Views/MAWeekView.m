@@ -136,8 +136,6 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 - (void)setupCustomInitialisation;
 - (void)changeWeek:(UIButton *)sender;
 - (NSDate *)firstDayOfWeekFromDate:(NSDate *)date;
-- (NSDate *)nextWeekFromDate:(NSDate *)date;
-- (NSDate *)previousWeekFromDate:(NSDate *)date;
 - (void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer;
 
 @property (readonly) UIImageView *topBackground;
@@ -454,11 +452,13 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 }
 
 - (void)changeWeek:(UIButton *)sender {
+	NSDate* date = self.targetDate;
 	if (ARROW_LEFT == sender.tag) {
-		self.week = [self previousWeekFromDate:_week];
+		date = [date dateByAddingTimeInterval:-7*24*60*60];
 	} else if (ARROW_RIGHT == sender.tag) {
-		self.week = [self nextWeekFromDate:_week];
+		date = [date dateByAddingTimeInterval:7*24*60*60];
 	}
+	self.targetDate = date;
 }
 
 - (void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer {
@@ -480,28 +480,6 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 	return [CURRENT_CALENDAR dateFromComponents:components];
 }
 
-- (NSDate *)nextWeekFromDate:(NSDate *)date {
-	CFCalendarRef currentCalendar = CFCalendarCopyCurrent();
-	NSDateComponents *components = [CURRENT_CALENDAR components:DATE_COMPONENTS fromDate:date];
-	[components setDay:([components day] - ([components weekday] - CFCalendarGetFirstWeekday(currentCalendar) - 7))];
-	[components setHour:0];
-	[components setMinute:0];
-	[components setSecond:0];
-	CFRelease(currentCalendar);
-	return [CURRENT_CALENDAR dateFromComponents:components];
-}
-
-- (NSDate *)previousWeekFromDate:(NSDate *)date {
-	CFCalendarRef currentCalendar = CFCalendarCopyCurrent();
-	NSDateComponents *components = [CURRENT_CALENDAR components:DATE_COMPONENTS fromDate:date];
-	[components setDay:([components day] - ([components weekday] - CFCalendarGetFirstWeekday(currentCalendar) + 7))];
-	[components setHour:0];
-	[components setMinute:0];
-	[components setSecond:0];
-	CFRelease(currentCalendar);
-	return [CURRENT_CALENDAR dateFromComponents:components];
-}
-
 - (NSString *)titleText {
 	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
 	NSDateComponents *components = [CURRENT_CALENDAR components:DATE_COMPONENTS fromDate:_week];
@@ -511,6 +489,15 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 	return [NSString stringWithFormat:@"%@, week %i",
 			[monthSymbols objectAtIndex:[components month] - 1],
 			[components week]];
+}
+
+
+- (void)setTargetDate:(NSDate *)targetDate
+{
+    [self willChangeValueForKey:@"targetDate"];
+    _targetDate = targetDate;
+    self.week = targetDate;
+    [self didChangeValueForKey:@"targetDate"];
 }
 
 @end

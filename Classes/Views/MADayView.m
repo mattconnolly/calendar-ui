@@ -109,8 +109,6 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 @interface MADayView (PrivateMethods)
 - (void)setupCustomInitialisation;
 - (void)changeDay:(UIButton *)sender;
-- (NSDate *)nextDayFromDate:(NSDate *)date;
-- (NSDate *)previousDayFromDate:(NSDate *)date;
 - (void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer;
 
 @property (readonly) UIImageView *topBackground;
@@ -360,11 +358,13 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 }
 
 - (void)changeDay:(UIButton *)sender {
+    NSDate* date = self.targetDate;
 	if (ARROW_LEFT == sender.tag) {
-		self.day = [self previousDayFromDate:_day];
+		date = [date dateByAddingTimeInterval:-24*60*60];
 	} else if (ARROW_RIGHT == sender.tag) {
-		self.day = [self nextDayFromDate:_day];
+        date = [date dateByAddingTimeInterval:24*60*60];
 	}
+    self.targetDate = date;
 }
 
 - (void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer {
@@ -373,24 +373,6 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 	} else  if (recognizer.direction == UISwipeGestureRecognizerDirectionRight) {
 		[self changeDay:self.leftArrow];
 	}
-}
-
-- (NSDate *)nextDayFromDate:(NSDate *)date {
-	NSDateComponents *components = [CURRENT_CALENDAR components:DATE_COMPONENTS fromDate:date];
-	[components setDay:[components day] + 1];
-	[components setHour:0];
-	[components setMinute:0];
-	[components setSecond:0];
-	return [CURRENT_CALENDAR dateFromComponents:components];
-}
-
-- (NSDate *)previousDayFromDate:(NSDate *)date {
-	NSDateComponents *components = [CURRENT_CALENDAR components:DATE_COMPONENTS fromDate:date];
-	[components setDay:[components day] - 1];
-	[components setHour:0];
-	[components setMinute:0];
-	[components setSecond:0];
-	return [CURRENT_CALENDAR dateFromComponents:components];
 }
 
 - (NSString *)titleText {
@@ -402,6 +384,14 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 	
 	return [NSString stringWithFormat:@"%@ %@",
 			[weekdaySymbols objectAtIndex:[components weekday] - 1], [formatter stringFromDate:_day]];
+}
+
+- (void)setTargetDate:(NSDate *)targetDate
+{
+    [self willChangeValueForKey:@"targetDate"];
+    _targetDate = targetDate;
+    self.day = targetDate;
+    [self didChangeValueForKey:@"targetDate"];
 }
 
 @end

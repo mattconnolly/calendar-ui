@@ -64,6 +64,7 @@
 @property (nonatomic,unsafe_unretained) IBOutlet id<MAWeekViewDataSource> dataSource;
 @property (nonatomic,unsafe_unretained) IBOutlet id<MAWeekViewDelegate> delegate;
 @property (nonatomic,assign) UIView* tappedView;
+@property (nonatomic,retain) NSDate* targetDate;
 
 - (void)reloadData;
 
